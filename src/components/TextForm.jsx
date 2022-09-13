@@ -1,42 +1,53 @@
-import React, { useState } from "react";
-import "../App.css";
+import React, { useEffect, useState } from "react";
 
 export default function TextForm(props) {
-  const [text, setText] = useState("");
-  const handelOnChange = (event) => {
+  const handleUpClick = () => {
+    let newText = text.toUpperCase();
+    setText(newText);
+    props.showAlert("Converted to uppercase!", "success");
+  };
+
+  const handleLoClick = () => {
+    let newText = text.toLowerCase();
+    setText(newText);
+    props.showAlert("Converted to lowercase!", "success");
+  };
+
+  const handleClearClick = () => {
+    let newText = "";
+    setText(newText);
+    props.showAlert("Text Cleared!", "success");
+  };
+
+  const handleOnChange = (event) => {
     setText(event.target.value);
   };
 
-  const handelLoClick = () => {
-    let newText = text.toLowerCase();
-    setText(newText);
-    props.showAlert("Converted to lowercase", "success");
-  };
-
-  const handelUpClick = () => {
-    let newText = text.toUpperCase();
-    setText(newText);
-    props.showAlert("Converted to uppercase", "success");
-  };
-
-  const handelClearClick = () => {
-    let newText = "";
-    setText(newText);
-    props.showAlert("Text cleared!", "success");
-  };
-
-  const handelCopyClick = () => {
+  const handleCopy = () => {
     navigator.clipboard.writeText(text);
-    props.showAlert("copied to clipboard!", "success");
+    props.showAlert("Copied to Clipboard!", "success");
   };
 
-  const handelExtraSpace = () => {
+  const handleExtraSpaces = () => {
     let newText = text.split(/[ ]+/);
     setText(newText.join(" "));
-    props.showAlert("Extra space removed!", "success");
+    props.showAlert("Extra spaces removed!", "success");
   };
+
+  const [text, setText] = useState("");
+  const [words, setWords] = useState(0);
+
+  useEffect(() => {
+    let texts = text
+      .trim()
+      .split(" ")
+      .filter((element) => {
+        return element !== "";
+      }).length;
+    setWords(texts);
+  }, [text]);
   return (
-    <React.Fragment>
+    <>
       <div
         className="container"
         style={{ color: props.mode === "dark" ? "white" : "#042743" }}
@@ -46,75 +57,67 @@ export default function TextForm(props) {
           <textarea
             className="form-control"
             value={text}
-            onChange={handelOnChange}
+            onChange={handleOnChange}
             style={{
-              backgroundColor: props.mode === "dark" ? "grey" : "white",
-              color: props.mode === "dark" ? "white" : "black",
+              backgroundColor: props.mode === "dark" ? "#13466e" : "white",
+              color: props.mode === "dark" ? "white" : "#042743",
             }}
             id="myBox"
             rows="8"
           ></textarea>
         </div>
-
         <button
+          disabled={text.length === 0}
           className="btn btn-primary mx-1 my-1"
-          onClick={handelUpClick}
-          type="button"
+          onClick={handleUpClick}
         >
-          Convert to uppercase
+          Convert to Uppercase
         </button>
         <button
+          disabled={text.length === 0}
           className="btn btn-primary mx-1 my-1"
-          onClick={handelLoClick}
-          type="button"
+          onClick={handleLoClick}
         >
-          Convert to lowercase
+          Convert to Lowercase
         </button>
         <button
+          disabled={text.length === 0}
           className="btn btn-primary mx-1 my-1"
-          onClick={handelClearClick}
-          type="button"
+          onClick={handleClearClick}
         >
-          Clear text
+          Clear Text
         </button>
         <button
+          disabled={text.length === 0}
           className="btn btn-primary mx-1 my-1"
-          onClick={handelCopyClick}
-          type="button"
+          onClick={handleCopy}
         >
-          Copy text
+          Copy Text
         </button>
         <button
+          disabled={text.length === 0}
           className="btn btn-primary mx-1 my-1"
-          onClick={handelExtraSpace}
-          type="button"
+          onClick={handleExtraSpaces}
         >
-          Remove extra space
+          Remove Extra Spaces
         </button>
-
-        <div
-          className="container my-3"
-          style={{ color: props.mode === "dark" ? "white" : "black" }}
-        >
-          <h2>Your text summary</h2>
-          <p>
-            {
-              text.split(/\s+/).filter((element) => {
-                return element.length !== 0;
-              }).length
-            }{" "}
-            words and {text.length} charecters
-          </p>
-          <p>
-            {0.008 *
-              text.split(/\s+/).filter((element) => {
-                return element.length !== 0;
-              }).length}{" "}
-            Minuts read
-          </p>
-          <p>{text.length > 0 ? text : "Nothing to priview!"} Preview</p>
-        </div>
       </div>
-    </React.Fragment>
+      <div
+        className="container my-3"
+        style={{ color: props.mode === "dark" ? "white" : "#042743" }}
+      >
+        <h2>Your text summary</h2>
+        <p>
+          {words}
+          words and {text.length} characters
+        </p>
+        <p>
+          {0.008 * words}
+          Minutes read
+        </p>
+        <h2>Preview</h2>
+        <p>{text.length > 0 ? text : "Nothing to preview!"}</p>
+      </div>
+    </>
   );
 }
